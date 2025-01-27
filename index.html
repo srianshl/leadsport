@@ -19,6 +19,9 @@
       min-width: 200px;
       box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
       z-index: 1;
+      opacity: 0; /* Start invisible for animation */
+      transform: translateY(-10px); /* Start slightly above for animation */
+      transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
     }
 
     .dropdown-content a {
@@ -28,12 +31,16 @@
       display: block;
     }
 
-    .dropdown-content a:hover {
+    .dropdown-content a:hover,
+    .dropdown-content a:focus {
       background-color: #ddd;
+      outline: none; /* Remove default focus outline */
     }
 
     .dropdown-content.show {
       display: block;
+      opacity: 1; /* Fully visible */
+      transform: translateY(0); /* Move to final position */
     }
   </style>
 </head>
@@ -54,7 +61,7 @@
       <h2>Empowering Athletes with Expert Coaching</h2>
       <p>Connect with professional coaches and take your skills to the next level.</p>
       <div class="search-container">
-        <input type="text" id="sportInput" placeholder="Type to search for a sport..." oninput="filterSports()" onclick="toggleDropdown(true)">
+        <input type="text" id="sportInput" placeholder="Type to search for a sport..." oninput="filterSports()" onclick="showDropdown()" onkeydown="handleInputKeyDown(event)">
         <div id="sportsDropdown" class="dropdown-content">
           <a href="football.html">Football</a>
           <a href="basketball.html">Basketball</a>
@@ -90,7 +97,16 @@
     const input = document.getElementById('sportInput');
     const dropdown = document.getElementById('sportsDropdown');
 
-    // Show/hide dropdown on click
+    // Show dropdown with all options
+    function showDropdown() {
+      const links = dropdown.getElementsByTagName('a');
+      for (let i = 0; i < links.length; i++) {
+        links[i].style.display = ''; // Show all options
+      }
+      toggleDropdown(true);
+    }
+
+    // Show/hide dropdown
     function toggleDropdown(show) {
       if (show) {
         dropdown.classList.add('show');
@@ -115,12 +131,55 @@
       toggleDropdown(true);
     }
 
+    // Handle keyboard events for input and dropdown
+    function handleInputKeyDown(event) {
+      const links = dropdown.getElementsByTagName('a');
+      const focusedElement = document.activeElement;
+
+      if (event.key === 'Escape') {
+        toggleDropdown(false);
+        input.focus();
+      } else if (event.key === 'Tab' && !event.shiftKey) {
+        if (focusedElement === input && dropdown.classList.contains('show')) {
+          event.preventDefault();
+          links[0].focus(); // Focus on the first dropdown item
+        }
+      }
+    }
+
+    // Handle keyboard events for dropdown items
+    dropdown.addEventListener('keydown', (event) => {
+      const links = dropdown.getElementsByTagName('a');
+      const focusedElement = document.activeElement;
+
+      if (event.key === 'Enter' && focusedElement.tagName === 'A') {
+        window.location.href = focusedElement.href; // Navigate to the link
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        const nextElement = focusedElement.nextElementSibling;
+        if (nextElement && nextElement.tagName === 'A') {
+          nextElement.focus();
+        }
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        const prevElement = focusedElement.previousElementSibling;
+        if (prevElement && prevElement.tagName === 'A') {
+          prevElement.focus();
+        } else {
+          input.focus(); // Move focus back to input
+        }
+      } else if (event.key === 'Escape') {
+        toggleDropdown(false);
+        input.focus();
+      }
+    });
+
     // Hide dropdown when clicking outside
-    window.onclick = function (event) {
-      if (!event.target.matches('#sportInput')) {
+    window.addEventListener('click', (event) => {
+      if (!event.target.matches('#sportInput') && !event.target.matches('.dropdown-content a')) {
         toggleDropdown(false);
       }
-    };
+    });
   </script>
 </body>
 </html>
