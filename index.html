@@ -5,6 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LeadSport - Empowering Athletes with Expert Coaching</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Basic dropdown styling */
+    .search-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f1f1f1;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 10px 15px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <!-- Header -->
@@ -23,7 +54,7 @@
       <h2>Empowering Athletes with Expert Coaching</h2>
       <p>Connect with professional coaches and take your skills to the next level.</p>
       <div class="search-container">
-        <input type="text" id="sportInput" placeholder="Type to search for a sport..." oninput="filterSports()">
+        <input type="text" id="sportInput" placeholder="Type to search for a sport..." oninput="filterSports()" onclick="toggleDropdown(true)">
         <div id="sportsDropdown" class="dropdown-content">
           <a href="football.html">Football</a>
           <a href="basketball.html">Basketball</a>
@@ -55,6 +86,41 @@
     <p>&copy; 2025 LeadSport. All rights reserved.</p>
   </footer>
 
-  <script src="scripts.js"></script>
+  <script>
+    const input = document.getElementById('sportInput');
+    const dropdown = document.getElementById('sportsDropdown');
+
+    // Show/hide dropdown on click
+    function toggleDropdown(show) {
+      if (show) {
+        dropdown.classList.add('show');
+      } else {
+        dropdown.classList.remove('show');
+      }
+    }
+
+    // Filter dropdown items based on input
+    function filterSports() {
+      const filter = input.value.toLowerCase();
+      const links = dropdown.getElementsByTagName('a');
+
+      for (let i = 0; i < links.length; i++) {
+        const text = links[i].innerText.toLowerCase();
+        if (text.includes(filter)) {
+          links[i].style.display = '';
+        } else {
+          links[i].style.display = 'none';
+        }
+      }
+      toggleDropdown(true);
+    }
+
+    // Hide dropdown when clicking outside
+    window.onclick = function (event) {
+      if (!event.target.matches('#sportInput')) {
+        toggleDropdown(false);
+      }
+    };
+  </script>
 </body>
 </html>
